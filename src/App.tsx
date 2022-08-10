@@ -1,25 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { signOut } from 'firebase/auth';
+import { useCallback, useContext } from 'react';
+import { AuthContext } from './AuthProvider';
+import { auth } from './firebase/auth';
+import Login from './pages/Login/Login';
 
 function App() {
+  const user = useContext(AuthContext);
+
+  const handleLogout = useCallback(() => {
+    signOut(auth);
+  }, []);
+
+  if (!user) {
+    return <Login />;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      Você já está logado como <b>{user.email}</b>.
+      <button onClick={handleLogout}>Logout</button>
+    </>
   );
 }
 
