@@ -2,18 +2,17 @@ import React, { ChangeEvent, FC, useCallback, useState } from 'react';
 import { Form, Wrapper } from './Login.styles';
 import background from './background.jpg';
 import Logo from '../../assets/logo.png';
-import { FacebookFilled, GoogleOutlined } from '@ant-design/icons';
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
-import ResetPassword from './ResetPassword';
 
 const GoogleProvider = new GoogleAuthProvider();
 
-const Login: FC = () => {
+const ResetPassword : FC = () => {
+  
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
@@ -40,16 +39,6 @@ const Login: FC = () => {
     signInWithPopup(auth, GoogleProvider);
   }, []);
 
-
-  //return (
-    //<>
-        
-    //    Você já está logado como <b>{user.email}</b>.
-    //    <button onClick={handleLogout}>Logout</button>
-    //  </>
-    //);
-  
-
   return (
     <>
       <Wrapper background={background}>
@@ -61,28 +50,11 @@ const Login: FC = () => {
             onChange={(e) => handleInput('email', e)}
             placeholder='Insira seu e-mail'
           ></input>
-          <input
-            type='password'
-            autoComplete={'false'}
-            value={credentials.password}
-            onChange={(e) => handleInput('password', e)}
-            placeholder='Insira sua senha'
-          ></input>
-          <button onClick={handleEnter}>Entrar</button>
-          <span>
-            ou <span className='link'>clique aqui para inscrever-se</span>
-          </span>
-          <span>
-            <span className='link white'><a href='/resetpassword'>Esqueci minha senha</a></span>
-          </span>
-          <div className='social-options'>
-            <span onClick={handleGoogle} className='social-icon google'>
-              <GoogleOutlined />
-            </span>
-            <span className='social-icon google'>
-              <FacebookFilled />
-            </span>
-          </div>
+         
+          <button onClick={handleEnter}>Resetar Senha</button>
+        
+          
+         
           <span className='source'>
             Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
           </span>
@@ -92,4 +64,4 @@ const Login: FC = () => {
   );
 };
 
-export default Login;
+export default ResetPassword;
