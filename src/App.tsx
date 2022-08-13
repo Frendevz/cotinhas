@@ -1,14 +1,11 @@
-import { GoogleAuthProvider, signOut } from 'firebase/auth';
-import { Component, ReactNode, useCallback, useContext } from 'react';
+import { useContext } from 'react';
 import { AuthContext } from './AuthProvider';
-import { auth } from './firebase/auth';
 import Login from './pages/Login/Login';
 import ResetPassword from './pages/Login/ResetPassword';
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Link,
   Navigate,
   Outlet,
 } from 'react-router-dom';
@@ -20,9 +17,17 @@ function App() {
   console.log('Email:' + user?.email);
   console.log('User:' + user);
 
-  const PrivateRoutes = () => {
+  const PrivateRoute = () => {
+    if (!user) {
+      return <Navigate to='/login' />;
+    } else {
+      return <Outlet />;
+    }
+  };
+
+  const UnauthenticatedRoute = () => {
     if (user) {
-      return <Navigate to="/login" />;
+      return <Navigate to='/home' />;
     } else {
       return <Outlet />;
     }
@@ -32,15 +37,13 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />}></Route>
-          <Route path="/login" element={<Login />}></Route>
-          <Route
-            path="/resetpassword"
-            element={<ResetPassword />}
-          ></Route>
-          <Route path="/home" element={<Home />} />
-          <Route element={<PrivateRoutes />}>
-            <Route path="/home" element={<Home />} />
+          <Route path='/' element={<Login />}></Route>
+          <Route element={<UnauthenticatedRoute />}>
+            <Route path='/login' element={<Login />}></Route>
+          </Route>
+          <Route path='/resetpassword' element={<ResetPassword />}></Route>
+          <Route element={<PrivateRoute />}>
+            <Route path='/home' element={<Home />} />
           </Route>
         </Routes>
       </Router>
