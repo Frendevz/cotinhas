@@ -19,7 +19,7 @@ function App() {
 
   const PrivateRoute = () => {
     if (!user) {
-      return <Navigate to='/login' />;
+      return <Navigate to="/login" />;
     } else {
       return <Outlet />;
     }
@@ -27,7 +27,7 @@ function App() {
 
   const UnauthenticatedRoute = () => {
     if (user) {
-      return <Navigate to='/home' />;
+      return <Navigate to="/home" />;
     } else {
       return <Outlet />;
     }
@@ -37,13 +37,16 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path='/' element={<Login />}></Route>
+          <Route path="/" element={<Login />}></Route>
           <Route element={<UnauthenticatedRoute />}>
-            <Route path='/login' element={<Login />}></Route>
+            <Route path="/login" element={<Login />}></Route>
           </Route>
-          <Route path='/resetpassword' element={<ResetPassword />}></Route>
+          <Route
+            path="/resetpassword"
+            element={<ResetPassword />}
+          ></Route>
           <Route element={<PrivateRoute />}>
-            <Route path='/home' element={<Home />} />
+            <Route path="/home" element={<Home />} />
           </Route>
         </Routes>
       </Router>

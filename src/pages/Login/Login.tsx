@@ -40,51 +40,58 @@ const Login: FC = () => {
     signInWithPopup(auth, GoogleProvider);
   }, []);
 
-
   //return (
-    //<>
-        
-    //    Você já está logado como <b>{user.email}</b>.
-    //    <button onClick={handleLogout}>Logout</button>
-    //  </>
-    //);
-  
+  //<>
+
+  //    Você já está logado como <b>{user.email}</b>.
+  //    <button onClick={handleLogout}>Logout</button>
+  //  </>
+  //);
 
   return (
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt='Cocotinhas' />
+          <img src={Logo} alt="Cocotinhas" />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder='Insira seu e-mail'
+            placeholder="Insira seu e-mail"
           ></input>
           <input
-            type='password'
+            type="password"
             autoComplete={'false'}
             value={credentials.password}
             onChange={(e) => handleInput('password', e)}
-            placeholder='Insira sua senha'
+            placeholder="Insira sua senha"
           ></input>
           <button onClick={handleEnter}>Entrar</button>
           <span>
-            ou <span className='link'>clique aqui para inscrever-se</span>
+            ou{' '}
+            <span className="link">
+              clique aqui para inscrever-se
+            </span>
           </span>
           <span>
-            <span className='link white'><a href='/resetpassword'>Esqueci minha senha</a></span>
+            <span className="link white">
+              <a href="/resetpassword">Esqueci minha senha</a>
+            </span>
           </span>
-          <div className='social-options'>
-            <span onClick={handleGoogle} className='social-icon google'>
+          <div className="social-options">
+            <span
+              onClick={handleGoogle}
+              className="social-icon google"
+            >
               <GoogleOutlined />
             </span>
-            <span className='social-icon google'>
+            <span className="social-icon google">
               <FacebookFilled />
             </span>
           </div>
-          <span className='source'>
-            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
+          <span className="source">
+            Made with ♥️ by{' '}
+            <span className="company-name">FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>
