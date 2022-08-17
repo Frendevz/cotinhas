@@ -4,9 +4,10 @@ import background from './background.jpg';
 import Logo from '../../assets/logo.png';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ResetPassword: FC = () => {
+  const navigate = useNavigate();
   const [credentials, setCredentials] = useState({
     email: '',
   });
@@ -21,7 +22,7 @@ const ResetPassword: FC = () => {
   const handleEnter = useCallback(() => {
     sendPasswordResetEmail(auth, credentials.email)
       .then(() => {
-        <Navigate to="/home" />;
+        navigate('/home');
       })
       .catch((err: any) => {
         window.alert(err);
@@ -32,19 +33,18 @@ const ResetPassword: FC = () => {
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt="Cocotinhas" />
+          <img src={Logo} alt='Cocotinhas' />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder="Insira seu e-mail"
+            placeholder='Insira seu e-mail'
           ></input>
 
           <button onClick={handleEnter}>Resetar Senha</button>
 
-          <span className="source">
-            Made with ♥️ by{' '}
-            <span className="company-name">FrenDevz 🐔</span>{' '}
+          <span className='source'>
+            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>
