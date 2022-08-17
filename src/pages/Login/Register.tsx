@@ -1,18 +1,20 @@
-import { ChangeEvent, FC, useCallback, useState } from 'react';
+import React, { ChangeEvent, FC, useCallback, useState } from 'react';
 import { Form, Wrapper } from './Login.styles';
 import background from './background.jpg';
 import Logo from '../../assets/logo.png';
 import { FacebookFilled, GoogleOutlined } from '@ant-design/icons';
 import {
-  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
+import ResetPassword from './ResetPassword';
+import { ValidEmail } from '../../components/ValidEmail';
 
 const GoogleProvider = new GoogleAuthProvider();
 
-const Login: FC = () => {
+const Register: FC = () => {
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
@@ -25,31 +27,45 @@ const Login: FC = () => {
     []
   );
 
+  function validFields(): boolean {
+    if (
+      credentials.email == null ||
+      credentials.email == '' ||
+      !ValidEmail(credentials.email)
+    ) {
+      window.alert('Informe um e-mail válido');
+      return false;
+    }
+
+    if (
+      credentials.password == null ||
+      credentials.password == '' ||
+      credentials.password.length < 6
+    ) {
+      window.alert(
+        'Informe uma senha válida com no minimo 6 caracteres'
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   const handleEnter = useCallback(() => {
-    if (credentials.email && credentials.password) {
-      signInWithEmailAndPassword(
+    if (validFields()) {
+      createUserWithEmailAndPassword(
         auth,
         credentials.email,
         credentials.password
       ).catch((err: any) => {
         window.alert(err);
       });
-    } else {
-      window.alert('Informe usuário e senha');
     }
   }, [credentials]);
 
   const handleGoogle = useCallback(() => {
     signInWithPopup(auth, GoogleProvider);
   }, []);
-
-  //return (
-  //<>
-
-  //    Você já está logado como <b>{user.email}</b>.
-  //    <button onClick={handleLogout}>Logout</button>
-  //  </>
-  //);
 
   return (
     <>
@@ -69,18 +85,8 @@ const Login: FC = () => {
             onChange={(e) => handleInput('password', e)}
             placeholder="Insira sua senha"
           ></input>
-          <button onClick={handleEnter}>Entrar</button>
-          <span>
-            ou{' '}
-            <span className="link">
-              <a href="/register">clique aqui para inscrever-se</a>
-            </span>
-          </span>
-          <span>
-            <span className="link white">
-              <a href="/resetpassword">Esqueci minha senha</a>
-            </span>
-          </span>
+          <button onClick={handleEnter}>Cadastrar-se</button>
+
           <div className="social-options">
             <span
               onClick={handleGoogle}
@@ -102,4 +108,4 @@ const Login: FC = () => {
   );
 };
 
-export default Login;
+export default Register;
