@@ -34,7 +34,7 @@ const Register: FC = () => {
       !ValidEmail(credentials.email)
     ) {
       notification.error({
-        message: 'E-mail inválido',
+        message: 'Informe um e-mail válido',
       });
       return false;
     }
@@ -44,7 +44,10 @@ const Register: FC = () => {
       credentials.password == '' ||
       credentials.password.length < 6
     ) {
-      window.alert('Informe uma senha válida com no minimo 6 caracteres');
+      notification.error({
+        message:
+          'Informe uma senha válida com no minimo 6 caracteres',
+      });
       return false;
     }
 
@@ -58,7 +61,10 @@ const Register: FC = () => {
         credentials.email,
         credentials.password
       ).catch((err: any) => {
-        window.alert(err);
+        notification.error({
+          message: 'Houve um problema ao registrar, tente mais tarde',
+        });
+        console.log(err);
       });
     }
   }, [credentials]);
@@ -71,32 +77,36 @@ const Register: FC = () => {
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt='Cocotinhas' />
+          <img src={Logo} alt="Cocotinhas" />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder='Insira seu e-mail'
+            placeholder="Insira seu e-mail"
           ></input>
           <input
-            type='password'
+            type="password"
             autoComplete={'false'}
             value={credentials.password}
             onChange={(e) => handleInput('password', e)}
-            placeholder='Insira sua senha'
+            placeholder="Insira sua senha"
           ></input>
           <button onClick={handleEnter}>Cadastrar-se</button>
 
-          <div className='social-options'>
-            <span onClick={handleGoogle} className='social-icon google'>
+          <div className="social-options">
+            <span
+              onClick={handleGoogle}
+              className="social-icon google"
+            >
               <GoogleOutlined />
             </span>
-            <span className='social-icon google'>
+            <span className="social-icon google">
               <FacebookFilled />
             </span>
           </div>
-          <span className='source'>
-            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
+          <span className="source">
+            Made with ♥️ by{' '}
+            <span className="company-name">FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>

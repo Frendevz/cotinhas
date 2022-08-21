@@ -9,6 +9,8 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
+import { notification } from 'antd';
+import { ValidEmail } from '../../components/ValidEmail';
 
 const GoogleProvider = new GoogleAuthProvider();
 
@@ -18,6 +20,33 @@ const Login: FC = () => {
     password: '',
   });
 
+  function validFields(): boolean {
+    if (
+      credentials.email == null ||
+      credentials.email == '' ||
+      !ValidEmail(credentials.email)
+    ) {
+      notification.error({
+        message: 'Informe um e-mail válido',
+      });
+      return false;
+    }
+
+    if (
+      credentials.password == null ||
+      credentials.password == '' ||
+      credentials.password.length < 6
+    ) {
+      notification.error({
+        message:
+          'Informe uma senha válida com no minimo 6 caracteres',
+      });
+      return false;
+    }
+
+    return true;
+  }
+
   const handleInput = useCallback(
     (target: string, event: ChangeEvent<HTMLInputElement>) => {
       setCredentials((c) => ({ ...c, [target]: event.target.value }));
@@ -26,21 +55,39 @@ const Login: FC = () => {
   );
 
   const handleEnter = useCallback(() => {
-    if (credentials.email && credentials.password) {
+    if (validFields()) {
       signInWithEmailAndPassword(
         auth,
         credentials.email,
         credentials.password
-      ).catch((err: any) => {
-        window.alert(err);
-      });
-    } else {
-      window.alert('Informe usuário e senha');
+      )
+        .then(() => {
+          notification.success({
+            message: 'Logado com sucesso',
+          });
+        })
+        .catch((err: any) => {
+          notification.error({
+            message:
+              'Não foi possível fazer o login, tente mais tarde',
+          });
+          console.log(err);
+        });
     }
   }, [credentials]);
 
   const handleGoogle = useCallback(() => {
-    signInWithPopup(auth, GoogleProvider);
+    signInWithPopup(auth, GoogleProvider)
+      .then(() => {
+        notification.success({
+          message: 'Logado com sucesso',
+        });
+      })
+      .catch(() => {
+        notification.error({
+          message: 'Houve um erro, tente novamente mais tarde',
+        });
+      });
   }, []);
 
   //return (
