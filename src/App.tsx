@@ -16,11 +16,11 @@ function App() {
       <Router>
         <Routes>
           <Route element={<UnauthenticatedRoute redirectUrl={redirectUrl} />}>
-            <Route path='/' element={<Login />}></Route>
-            <Route path='/login' element={<Login />}></Route>
-            <Route path='/register' element={<Register />}></Route>
+            <Route path='/' element={<Login />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
           </Route>
-          <Route path='/resetpassword' element={<ResetPassword />}></Route>
+          <Route path='/resetpassword' element={<ResetPassword />} />
           <Route
             element={
               <PrivateRoute redirectUrl={[redirectUrl, setRedirectUrl]} />

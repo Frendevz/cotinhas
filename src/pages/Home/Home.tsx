@@ -18,7 +18,7 @@ function Row({ children }: { children?: ReactNode; name: string }) {
   );
 }
 
-export default function Home() {
+export default function Event() {
   const user = useContext(AuthContext);
   const [events, setEvents] = useState<EventData[]>([]);
   const [saldo, setSaldo] = useState(0);
