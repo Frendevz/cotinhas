@@ -6,7 +6,7 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { notification } from 'antd';
-import { ValidEmail } from '../../components/ValidEmail';
+import { ValidEmail } from '../../utils/ValidEmail';
 
 const ResetPassword: FC = () => {
   const navigate = useNavigate();
@@ -47,8 +47,7 @@ const ResetPassword: FC = () => {
         })
         .catch((err: any) => {
           notification.error({
-            message:
-              'Houve um problema enviar o e-mail, tente mais tarde',
+            message: 'Houve um problema enviar o e-mail, tente mais tarde',
           });
           console.log(err);
         });
@@ -59,19 +58,18 @@ const ResetPassword: FC = () => {
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt="Cocotinhas" />
+          <img src={Logo} alt='Cocotinhas' />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder="Insira seu e-mail"
+            placeholder='Insira seu e-mail'
           ></input>
 
           <button onClick={handleEnter}>Resetar Senha</button>
 
-          <span className="source">
-            Made with ♥️ by{' '}
-            <span className="company-name">FrenDevz 🐔</span>{' '}
+          <span className='source'>
+            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>

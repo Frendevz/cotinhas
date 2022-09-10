@@ -9,7 +9,7 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
-import { ValidEmail } from '../../components/ValidEmail';
+import { ValidEmail } from '../../utils/ValidEmail';
 import { notification } from 'antd';
 
 const GoogleProvider = new GoogleAuthProvider();
@@ -45,8 +45,7 @@ const Register: FC = () => {
       credentials.password.length < 6
     ) {
       notification.error({
-        message:
-          'Informe uma senha válida com no minimo 6 caracteres',
+        message: 'Informe uma senha válida com no minimo 6 caracteres',
       });
       return false;
     }
@@ -77,36 +76,32 @@ const Register: FC = () => {
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt="Cocotinhas" />
+          <img src={Logo} alt='Cocotinhas' />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder="Insira seu e-mail"
+            placeholder='Insira seu e-mail'
           ></input>
           <input
-            type="password"
+            type='password'
             autoComplete={'false'}
             value={credentials.password}
             onChange={(e) => handleInput('password', e)}
-            placeholder="Insira sua senha"
+            placeholder='Insira sua senha'
           ></input>
           <button onClick={handleEnter}>Cadastrar-se</button>
 
-          <div className="social-options">
-            <span
-              onClick={handleGoogle}
-              className="social-icon google"
-            >
+          <div className='social-options'>
+            <span onClick={handleGoogle} className='social-icon google'>
               <GoogleOutlined />
             </span>
-            <span className="social-icon google">
+            <span className='social-icon google'>
               <FacebookFilled />
             </span>
           </div>
-          <span className="source">
-            Made with ♥️ by{' '}
-            <span className="company-name">FrenDevz 🐔</span>{' '}
+          <span className='source'>
+            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>

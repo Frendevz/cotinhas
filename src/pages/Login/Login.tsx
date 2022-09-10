@@ -10,7 +10,8 @@ import {
 } from 'firebase/auth';
 import { auth } from '../../firebase/auth';
 import { notification } from 'antd';
-import { ValidEmail } from '../../components/ValidEmail';
+import { ValidEmail } from '../../utils/ValidEmail';
+import { onUserCreated } from '../../controller/User.controller';
 
 const GoogleProvider = new GoogleAuthProvider();
 
@@ -38,8 +39,7 @@ const Login: FC = () => {
       credentials.password.length < 6
     ) {
       notification.error({
-        message:
-          'Informe uma senha válida com no minimo 6 caracteres',
+        message: 'Informe uma senha válida com no minimo 6 caracteres',
       });
       return false;
     }
@@ -56,20 +56,22 @@ const Login: FC = () => {
 
   const handleEnter = useCallback(() => {
     if (validFields()) {
-      signInWithEmailAndPassword(
-        auth,
-        credentials.email,
-        credentials.password
-      )
-        .then(() => {
+      signInWithEmailAndPassword(auth, credentials.email, credentials.password)
+        .then(({ user }) => {
           notification.success({
             message: 'Logado com sucesso',
+          });
+          onUserCreated({
+            createdAt: user.metadata.creationTime ?? Date.now().toString(),
+            updatedAt: Date.now().toString(),
+            name: user.displayName ?? 'Sem nome',
+            id: user.uid,
+            email: user.email ?? 'Sem email',
           });
         })
         .catch((err: any) => {
           notification.error({
-            message:
-              'Não foi possível fazer o login, tente mais tarde',
+            message: 'Não foi possível fazer o login, tente mais tarde',
           });
           console.log(err);
         });
@@ -78,9 +80,18 @@ const Login: FC = () => {
 
   const handleGoogle = useCallback(() => {
     signInWithPopup(auth, GoogleProvider)
-      .then(() => {
+      .then(({ user }) => {
         notification.success({
           message: 'Logado com sucesso',
+        });
+        onUserCreated({
+          createdAt: user.metadata.creationTime
+            ? new Date(user.metadata.creationTime).getTime().toString()
+            : Date.now().toString(),
+          updatedAt: Date.now().toString(),
+          name: user.displayName ?? 'Sem nome',
+          id: user.uid,
+          email: user.email ?? 'Sem email',
         });
       })
       .catch(() => {
@@ -102,46 +113,42 @@ const Login: FC = () => {
     <>
       <Wrapper background={background}>
         <Form>
-          <img src={Logo} alt="Cocotinhas" />
+          <img src={Logo} alt='Cocotinhas' />
           <h1>ZÉ COTINHAS</h1>
           <input
             value={credentials.email}
             onChange={(e) => handleInput('email', e)}
-            placeholder="Insira seu e-mail"
+            placeholder='Insira seu e-mail'
           ></input>
           <input
-            type="password"
+            type='password'
             autoComplete={'false'}
             value={credentials.password}
             onChange={(e) => handleInput('password', e)}
-            placeholder="Insira sua senha"
+            placeholder='Insira sua senha'
           ></input>
           <button onClick={handleEnter}>Entrar</button>
           <span>
             ou{' '}
-            <span className="link">
-              <a href="/register">clique aqui para inscrever-se</a>
+            <span className='link'>
+              <a href='/register'>clique aqui para inscrever-se</a>
             </span>
           </span>
           <span>
-            <span className="link white">
-              <a href="/resetpassword">Esqueci minha senha</a>
+            <span className='link white'>
+              <a href='/resetpassword'>Esqueci minha senha</a>
             </span>
           </span>
-          <div className="social-options">
-            <span
-              onClick={handleGoogle}
-              className="social-icon google"
-            >
+          <div className='social-options'>
+            <span onClick={handleGoogle} className='social-icon google'>
               <GoogleOutlined />
             </span>
-            <span className="social-icon google">
+            <span className='social-icon google'>
               <FacebookFilled />
             </span>
           </div>
-          <span className="source">
-            Made with ♥️ by{' '}
-            <span className="company-name">FrenDevz 🐔</span>{' '}
+          <span className='source'>
+            Made with ♥️ by <span className='company-name'>FrenDevz 🐔</span>{' '}
           </span>
         </Form>
       </Wrapper>
