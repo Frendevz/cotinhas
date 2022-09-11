@@ -6,11 +6,12 @@ import { EventData } from '../../models/Event.model';
 import { Container } from './Event.styles';
 import { UserAddOutlined } from '@ant-design/icons';
 import EventUsersModal from './EventUsersModal';
+import CreateEventModal from './CreateEventModal';
 
 function Row({ children }: { children?: ReactNode; name: string }) {
   return (
-    <div className='row'>
-      <div className='row-content'>{children}</div>
+    <div className="row">
+      <div className="row-content">{children}</div>
     </div>
   );
 }
@@ -18,11 +19,19 @@ function Row({ children }: { children?: ReactNode; name: string }) {
 export default function Event() {
   const [events, setEvents] = useState<EventData[]>([]);
   const [isUsersModalVisible, setUsersModalVisible] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<EventData | null>(null);
+  const [isCreateEventModalVisible, setCreateEventModalVisible] =
+    useState(false);
+  const [currentEvent, setCurrentEvent] = useState<EventData | null>(
+    null
+  );
 
   const showModal = (eventData: EventData) => {
     setCurrentEvent(eventData);
     setUsersModalVisible(true);
+  };
+
+  const showModalCreateEvent = () => {
+    setCreateEventModalVisible(true);
   };
 
   useEffect(() => {
@@ -41,7 +50,12 @@ export default function Event() {
       title: 'Total',
       render(value, record) {
         return (
-          <>{record.transactions.reduce((acc, curr) => acc + curr.amount, 0)}</>
+          <>
+            {record.transactions.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            )}
+          </>
         );
       },
       key: 'total',
@@ -58,8 +72,10 @@ export default function Event() {
       render(value, record) {
         return (
           <>
-            {record.transactions.reduce((acc, curr) => acc + curr.amount, 0) /
-              Math.max(record.members.length, 1)}
+            {record.transactions.reduce(
+              (acc, curr) => acc + curr.amount,
+              0
+            ) / Math.max(record.members.length, 1)}
           </>
         );
       },
@@ -86,17 +102,23 @@ export default function Event() {
         state={[isUsersModalVisible, setUsersModalVisible]}
         event={currentEvent}
       />
+      <CreateEventModal
+        state={[
+          isCreateEventModalVisible,
+          setCreateEventModalVisible,
+        ]}
+      />
       <Container>
-        <Row name='header'>
+        <Row name="header">
           <h1>Eventos</h1>
         </Row>
-        <Row name='header'>
-          <Button>Criar evento</Button>
+        <Row name="header">
+          <Button onClick={showModalCreateEvent}>Criar evento</Button>
         </Row>
-        <Row name='header'>
+        <Row name="header">
           <Table columns={columns} dataSource={events}></Table>
         </Row>
-        <Row name='header'></Row>
+        <Row name="header"></Row>
       </Container>
     </>
   );
