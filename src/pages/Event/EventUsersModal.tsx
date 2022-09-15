@@ -1,8 +1,16 @@
 import { Button, Input, Modal, Space, Table } from 'antd';
 import { ColumnType } from 'antd/lib/table';
-import { useEffect, useMemo, useState } from 'react';
+import {
+  collection,
+  CollectionReference,
+  doc,
+  onSnapshot,
+} from 'firebase/firestore';
+import { useContext, useEffect, useMemo, useState } from 'react';
+import { UserContext } from '../../context/UserProvider';
 import { addUser, removeUser } from '../../controller/Event.controller';
 import { getUsers } from '../../controller/User.controller';
+import db from '../../firebase/db';
 import { EventData } from '../../models/Event.model';
 import { UserData } from '../../models/User.model';
 
@@ -11,8 +19,35 @@ export default function EventUsersModal(props: {
   event: EventData | null;
 }) {
   const [open, setOpen] = props.state;
-  const [users, setUsers] = useState<UserData[]>([]);
-  const usersInEvent = props.event?.members ?? [];
+  const [event, setEvent] = useState<EventData | null>(null);
+
+  useEffect(() => {
+    let unsubscribeDoc = () => {};
+    if (props.event) {
+      const eventCol = collection(
+        db,
+        'events'
+      ) as CollectionReference<EventData>;
+      const eventDoc = doc<EventData>(eventCol, `${props.event.id}`);
+      unsubscribeDoc = onSnapshot(eventDoc, (doc) => {
+        const data = doc.data() ?? null;
+        if (data) {
+          data.id = doc.id;
+        }
+        setEvent(data);
+      });
+    }
+
+    return () => {
+      unsubscribeDoc();
+    };
+  }, [props.event]);
+
+  console.log(props.event);
+
+  const users = useContext(UserContext);
+
+  const usersInEvent = event?.members ?? [];
 
   const handleOk = () => {};
 
@@ -22,8 +57,8 @@ export default function EventUsersModal(props: {
 
   const handleUser = (user: UserData['id'], bRemove: boolean) => {
     const method = bRemove ? removeUser : addUser;
-    if (props.event) {
-      method(props.event, user);
+    if (event) {
+      method(event, user);
     }
   };
 
@@ -54,17 +89,10 @@ export default function EventUsersModal(props: {
     return columns;
   }, [usersInEvent]);
 
-  useEffect(() => {
-    (async () => {
-      const users = await getUsers();
-      setUsers(users);
-    })();
-  }, []);
-
   return (
     <Modal
       visible={open}
-      title={`Usuários do evento ${props.event?.name}`}
+      title={`Usuários do evento ${event?.name}`}
       onOk={handleOk}
       onCancel={handleCancel}
       footer={[
@@ -79,7 +107,7 @@ export default function EventUsersModal(props: {
       <Space direction='vertical' style={{ width: `100%` }}>
         <span>{usersInEvent.join(',')}</span>
         <Input />
-        <Table dataSource={users} columns={columns} />
+        <Table dataSource={users ?? []} columns={columns} />
       </Space>
     </Modal>
   );

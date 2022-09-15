@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'antd/dist/antd.css';
 import { AuthProvider } from './AuthProvider';
+import { UserProvider } from './context/UserProvider';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,7 +13,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <App/>
+      <UserProvider>
+        <App />
+      </UserProvider>
     </AuthProvider>
   </React.StrictMode>
 );
