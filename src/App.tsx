@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
-import { AuthContext } from './AuthProvider';
+import { useState } from 'react';
 import Login from './pages/Login/Login';
 import ResetPassword from './pages/Login/ResetPassword';
 import Register from './pages/Login/Register';

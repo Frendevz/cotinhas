@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import firebase from 'firebase/auth';
 import { UserData } from '../models/User.model';
 import {
   collection,

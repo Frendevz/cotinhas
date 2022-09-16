@@ -1,53 +1,33 @@
 import { Button, Input, Modal, Space, Table } from 'antd';
 import { ColumnType } from 'antd/lib/table';
 import {
-  collection,
-  CollectionReference,
-  doc,
+  DocumentReference,
+  DocumentSnapshot,
   onSnapshot,
 } from 'firebase/firestore';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { UserContext } from '../../context/UserProvider';
 import { addUser, removeUser } from '../../controller/Event.controller';
-import { getUsers } from '../../controller/User.controller';
-import db from '../../firebase/db';
 import { EventData } from '../../models/Event.model';
 import { UserData } from '../../models/User.model';
 
 export default function EventUsersModal(props: {
   state: [boolean, Function];
-  event: EventData | null;
+  event: DocumentReference<EventData> | null;
 }) {
   const [open, setOpen] = props.state;
-  const [event, setEvent] = useState<EventData | null>(null);
+  const [event, setEvent] = useState<DocumentSnapshot<EventData> | null>(null);
 
   useEffect(() => {
-    let unsubscribeDoc = () => {};
-    if (props.event) {
-      const eventCol = collection(
-        db,
-        'events'
-      ) as CollectionReference<EventData>;
-      const eventDoc = doc<EventData>(eventCol, `${props.event.id}`);
-      unsubscribeDoc = onSnapshot(eventDoc, (doc) => {
-        const data = doc.data() ?? null;
-        if (data) {
-          data.id = doc.id;
-        }
-        setEvent(data);
-      });
-    }
-
+    const unsubscribe = props.event && onSnapshot(props.event, setEvent);
     return () => {
-      unsubscribeDoc();
+      unsubscribe?.();
     };
   }, [props.event]);
 
-  console.log(props.event);
-
   const users = useContext(UserContext);
 
-  const usersInEvent = event?.members ?? [];
+  const usersInEvent = useMemo(() => event?.data()?.members ?? [], [event]);
 
   const handleOk = () => {};
 
@@ -55,12 +35,17 @@ export default function EventUsersModal(props: {
     setOpen(false);
   };
 
-  const handleUser = (user: UserData['id'], bRemove: boolean) => {
-    const method = bRemove ? removeUser : addUser;
-    if (event) {
-      method(event, user);
-    }
-  };
+  const handleUser = useCallback(
+    (user: UserData['id'], bRemove: boolean) => {
+      const method = bRemove ? removeUser : addUser;
+      const data = event?.data();
+      if (event && data) {
+        data.id = event.id;
+        method(data, user);
+      }
+    },
+    [event]
+  );
 
   const columns = useMemo(() => {
     const columns: ColumnType<UserData>[] = [
@@ -87,12 +72,12 @@ export default function EventUsersModal(props: {
     ];
 
     return columns;
-  }, [usersInEvent]);
+  }, [usersInEvent, handleUser]);
 
   return (
     <Modal
       visible={open}
-      title={`Usuários do evento ${event?.name}`}
+      title={`Usuários do evento ${event?.data()?.name}`}
       onOk={handleOk}
       onCancel={handleCancel}
       footer={[

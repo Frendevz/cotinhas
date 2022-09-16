@@ -1,33 +1,43 @@
-import { Button, Drawer, Table, Modal } from 'antd';
+import { Button, Table } from 'antd';
 import { ColumnType } from 'antd/lib/table';
 import { ReactNode, useEffect, useState } from 'react';
-import { getEvents } from '../../controller/Event.controller';
+import { eventCol } from '../../controller/Event.controller';
 import { EventData } from '../../models/Event.model';
 import { Container } from './Event.styles';
 import { UserAddOutlined } from '@ant-design/icons';
 import EventUsersModal from './EventUsersModal';
 import CreateEventModal from './CreateEventModal';
+import {
+  DocumentReference,
+  onSnapshot,
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+} from 'firebase/firestore';
+
+const f = new Intl.NumberFormat('pt-BR', { currency: 'BRL', style: 'currency' })
+  .format;
 
 function Row({ children }: { children?: ReactNode; name: string }) {
   return (
-    <div className="row">
-      <div className="row-content">{children}</div>
+    <div className='row'>
+      <div className='row-content'>{children}</div>
     </div>
   );
 }
 
 export default function Event() {
-  const [events, setEvents] = useState<EventData[]>([]);
+  const [events, setEvents] = useState<QuerySnapshot<EventData> | null>(null);
   const [isUsersModalVisible, setUsersModalVisible] = useState(false);
   const [isCreateEventModalVisible, setCreateEventModalVisible] =
     useState(false);
-  const [currentEvent, setCurrentEvent] = useState<EventData | null>(
-    null
-  );
+  const [currentEvent, setCurrentEvent] =
+    useState<DocumentReference<EventData> | null>(null);
 
-  const showModal = (eventData: EventData) => {
-    setCurrentEvent(eventData);
-    setUsersModalVisible(true);
+  const showModal = (eventData: QueryDocumentSnapshot<EventData> | null) => {
+    if (eventData) {
+      setCurrentEvent(eventData.ref);
+      setUsersModalVisible(true);
+    }
   };
 
   const showModalCreateEvent = () => {
@@ -35,25 +45,32 @@ export default function Event() {
   };
 
   useEffect(() => {
-    (async () => {
-      setEvents(await getEvents());
-    })();
+    const unsubscribe = onSnapshot(eventCol, (colSnapshopt) => {
+      setEvents(colSnapshopt);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  const columns: ColumnType<EventData>[] = [
+  const columns: ColumnType<QueryDocumentSnapshot<EventData>>[] = [
     {
       title: 'Nome',
-      dataIndex: 'name',
       key: 'name',
+      render(_, doc) {
+        return doc.data().name;
+      },
     },
     {
       title: 'Total',
       render(value, record) {
         return (
           <>
-            {record.transactions.reduce(
-              (acc, curr) => acc + curr.amount,
-              0
+            {f(
+              record
+                .data()
+                .transactions.reduce((acc, curr) => acc + curr.amount, 0)
             )}
           </>
         );
@@ -63,7 +80,7 @@ export default function Event() {
     {
       title: 'Membros',
       render(value, record) {
-        return <>{record.members.length}</>;
+        return <>{record.data().members.length}</>;
       },
       key: 'members',
     },
@@ -72,10 +89,12 @@ export default function Event() {
       render(value, record) {
         return (
           <>
-            {record.transactions.reduce(
-              (acc, curr) => acc + curr.amount,
-              0
-            ) / Math.max(record.members.length, 1)}
+            {f(
+              record
+                .data()
+                .transactions.reduce((acc, curr) => acc + curr.amount, 0) /
+                Math.max(record.data().members.length, 1)
+            )}
           </>
         );
       },
@@ -103,22 +122,19 @@ export default function Event() {
         event={currentEvent}
       />
       <CreateEventModal
-        state={[
-          isCreateEventModalVisible,
-          setCreateEventModalVisible,
-        ]}
+        state={[isCreateEventModalVisible, setCreateEventModalVisible]}
       />
       <Container>
-        <Row name="header">
+        <Row name='header'>
           <h1>Eventos</h1>
         </Row>
-        <Row name="header">
+        <Row name='header'>
           <Button onClick={showModalCreateEvent}>Criar evento</Button>
         </Row>
-        <Row name="header">
-          <Table columns={columns} dataSource={events}></Table>
+        <Row name='header'>
+          <Table columns={columns} dataSource={events?.docs}></Table>
         </Row>
-        <Row name="header"></Row>
+        <Row name='header'></Row>
       </Container>
     </>
   );

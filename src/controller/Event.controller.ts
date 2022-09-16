@@ -56,3 +56,5 @@ export const removeUser = async (
     await setDoc(eventRef, event);
   }
 };
+
+export const eventCol = col;
