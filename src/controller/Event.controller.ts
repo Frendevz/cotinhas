@@ -4,6 +4,7 @@ import {
   collection,
   CollectionReference,
   doc,
+  DocumentSnapshot,
   getDoc,
   getDocs,
   setDoc,
@@ -52,6 +53,20 @@ export const removeUser = async (
       (userId) => userId !== user
     );
     event.members = eventMembersWithoutUser;
+    const eventRef = doc(col, event.id);
+    await setDoc(eventRef, event);
+  }
+};
+
+export const addTransaction = async (
+  eventProp: DocumentSnapshot<EventData>,
+  transaction: EventData['transactions'][0]
+) => {
+  const event = await getEvent(eventProp.id);
+  if (event) {
+    const eventTransactions = event.transactions ?? [];
+    eventTransactions.push(transaction);
+    event.transactions = eventTransactions;
     const eventRef = doc(col, event.id);
     await setDoc(eventRef, event);
   }

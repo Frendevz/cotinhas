@@ -25,7 +25,7 @@ export default function EventUsersModal(props: {
     };
   }, [props.event]);
 
-  const users = useContext(UserContext);
+  const userCtx = useContext(UserContext);
 
   const usersInEvent = useMemo(() => event?.data()?.members ?? [], [event]);
 
@@ -92,7 +92,7 @@ export default function EventUsersModal(props: {
       <Space direction='vertical' style={{ width: `100%` }}>
         <span>{usersInEvent.join(',')}</span>
         <Input />
-        <Table dataSource={users ?? []} columns={columns} />
+        <Table dataSource={userCtx?.users ?? []} columns={columns} />
       </Space>
     </Modal>
   );

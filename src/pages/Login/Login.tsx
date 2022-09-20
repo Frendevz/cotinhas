@@ -67,6 +67,7 @@ const Login: FC = () => {
             name: user.displayName ?? 'Sem nome',
             id: user.uid,
             email: user.email ?? 'Sem email',
+            customPicture: user.photoURL ?? '',
           });
         })
         .catch((err: any) => {
@@ -92,6 +93,7 @@ const Login: FC = () => {
           name: user.displayName ?? 'Sem nome',
           id: user.uid,
           email: user.email ?? 'Sem email',
+          customPicture: user.photoURL ?? '',
         });
       })
       .catch(() => {

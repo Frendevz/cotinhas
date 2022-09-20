@@ -1,10 +1,14 @@
-import { Button, Table } from 'antd';
+import { Button, Space, Table } from 'antd';
 import { ColumnType } from 'antd/lib/table';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { eventCol } from '../../controller/Event.controller';
 import { EventData } from '../../models/Event.model';
 import { Container } from './Event.styles';
-import { UserAddOutlined } from '@ant-design/icons';
+import {
+  DollarCircleOutlined,
+  EyeOutlined,
+  UserAddOutlined,
+} from '@ant-design/icons';
 import EventUsersModal from './EventUsersModal';
 import CreateEventModal from './CreateEventModal';
 import {
@@ -13,6 +17,8 @@ import {
   QueryDocumentSnapshot,
   QuerySnapshot,
 } from 'firebase/firestore';
+import EventTransactionModal from './EventTransactionModal';
+import EventResumeModal from './EventResumeModal';
 
 const f = new Intl.NumberFormat('pt-BR', { currency: 'BRL', style: 'currency' })
   .format;
@@ -28,15 +34,29 @@ function Row({ children }: { children?: ReactNode; name: string }) {
 export default function Event() {
   const [events, setEvents] = useState<QuerySnapshot<EventData> | null>(null);
   const [isUsersModalVisible, setUsersModalVisible] = useState(false);
+  const [isTransactionsModalVisible, setTransactionsModalVisible] =
+    useState(false);
+  const [isResumeModalVisible, setResumeModalVisible] = useState(false);
   const [isCreateEventModalVisible, setCreateEventModalVisible] =
     useState(false);
   const [currentEvent, setCurrentEvent] =
     useState<DocumentReference<EventData> | null>(null);
 
-  const showModal = (eventData: QueryDocumentSnapshot<EventData> | null) => {
+  const togglerMap = useMemo(() => {
+    return {
+      USERS: setUsersModalVisible,
+      TRANSACTIONS: setTransactionsModalVisible,
+      RESUME: setResumeModalVisible,
+    };
+  }, []);
+
+  const showModal = (
+    target: 'USERS' | 'TRANSACTIONS' | 'RESUME',
+    eventData: QueryDocumentSnapshot<EventData> | null
+  ) => {
     if (eventData) {
       setCurrentEvent(eventData.ref);
-      setUsersModalVisible(true);
+      togglerMap[target](true);
     }
   };
 
@@ -105,9 +125,17 @@ export default function Event() {
       render(value, record) {
         return (
           <>
-            <Button onClick={() => showModal(record)}>
-              <UserAddOutlined />
-            </Button>
+            <Space>
+              <Button onClick={() => showModal('USERS', record)}>
+                <UserAddOutlined />
+              </Button>
+              <Button onClick={() => showModal('TRANSACTIONS', record)}>
+                <DollarCircleOutlined />
+              </Button>
+              <Button onClick={() => showModal('RESUME', record)}>
+                <EyeOutlined />
+              </Button>
+            </Space>
           </>
         );
       },
@@ -119,6 +147,14 @@ export default function Event() {
     <>
       <EventUsersModal
         state={[isUsersModalVisible, setUsersModalVisible]}
+        event={currentEvent}
+      />
+      <EventTransactionModal
+        state={[isTransactionsModalVisible, setTransactionsModalVisible]}
+        event={currentEvent}
+      />
+      <EventResumeModal
+        state={[isResumeModalVisible, setResumeModalVisible]}
         event={currentEvent}
       />
       <CreateEventModal
