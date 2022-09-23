@@ -13,9 +13,23 @@ import {
 } from '../../controller/Event.controller';
 import { EventData } from '../../models/Event.model';
 import { auth } from '../../firebase/auth';
-import { Container, Header } from './Home.styles';
+import { Container, Header } from './Profile.styles';
 import { getUserDebitBalance } from '../../controller/User.controller';
-import { Button } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import {
+  Form,
+  Input,
+  Button,
+  Radio,
+  Select,
+  Cascader,
+  DatePicker,
+  InputNumber,
+  TreeSelect,
+  Switch,
+  Checkbox,
+  Upload,
+} from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_PICTURE_URL =
@@ -29,16 +43,8 @@ function Row({ children }: { children?: ReactNode; name: string }) {
   );
 }
 
-export default function Event() {
+export default function Profile() {
   const user = useContext(AuthContext);
-  const [events, setEvents] = useState<EventData[]>([]);
-  const [saldo, setSaldo] = useState(0);
-
-  useEffect(() => {
-    getEvents().then((eventos) => {
-      setEvents(eventos);
-    });
-  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -60,12 +66,22 @@ export default function Event() {
     if (!user) {
       return;
     }
-
-    getEvents().then((eventos) => {
-      setEvents(eventos);
-    });
   };
 
+  const { RangePicker } = DatePicker;
+  const { TextArea } = Input;
+
+  const FormDisabledDemo = () => {
+    const [componentDisabled, setComponentDisabled] =
+      useState<boolean>(true);
+    const onFormLayoutChange = ({
+      disabled,
+    }: {
+      disabled: boolean;
+    }) => {
+      setComponentDisabled(disabled);
+    };
+  };
   return (
     <>
       <Container>
@@ -88,23 +104,46 @@ export default function Event() {
             </div>
           </Header>
         </Row>
-        <Row name="menu">Saldo: {saldo}</Row>
-        <Row name="events">
-          <Button
-            onClick={() => {
-              routeChange('event');
-            }}
-          >
-            Eventos
-          </Button>
-          <Button
-            onClick={() => {
-              routeChange('profile');
-            }}
-          >
-            Perfil
-          </Button>
-          <Button onClick={handleLogout}>Sair</Button>
+        <Row name="menu">
+          <Button>Salvar</Button>
+        </Row>
+        <Row name="body">
+          <Form layout="horizontal">
+            <Form.Item label="Nome">
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Email">
+              <Input disabled />
+            </Form.Item>
+
+            <Form.Item label="Tipo Chave PIX">
+              <Select>
+                <Select.Option value="CNPJ">CNPJ</Select.Option>
+                <Select.Option value="CPF">CPF</Select.Option>
+                <Select.Option value="EMAIL">EMAIL</Select.Option>
+                <Select.Option value="TELEFONE">
+                  TELEFONE
+                </Select.Option>
+                <Select.Option value="ALEATORIA">
+                  ALEATORIA
+                </Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item label="PIX">
+              <Input />
+            </Form.Item>
+
+            <Form.Item label="Foto Perfil" valuePropName="fileList">
+              <Upload action="/upload.do" listType="picture-card">
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>alterar foto</div>
+                </div>
+              </Upload>
+            </Form.Item>
+          </Form>
         </Row>
         <Row name="actions"></Row>
       </Container>
